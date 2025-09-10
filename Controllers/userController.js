@@ -1,4 +1,5 @@
 const { Association } = require('sequelize');
+const { Op, fn, col } = require("sequelize");
 const User = require('../Models/users');
 const Post = require('../Models/posts');
 const Like = require('../Models/likes');
@@ -8,22 +9,31 @@ const bcrypt = require('bcrypt');
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const { count, rows: users } = await User.findAndCountAll({
+      limit,
+      offset,
+      order: [["createdAt", "DESC"]],
+    });
+
     res.json({
       success: true,
       users,
-      message: "User fetched successfully"
+      totalUsers: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: page,
+      message: "Users fetched successfully",
     });
-  }
-
-  catch (error) {
-    res.status(500).json({ 
+  } catch (error) {
+    res.status(500).json({
       success: false,
-      message:`Error fetching users ${error.message}`
+      message: `Error fetching users ${error.message}`,
     });
   }
 };
-
 
 
   exports.getUserById = async (req, res) => {
@@ -746,26 +756,30 @@ exports.createUser2 = async (req, res) => {
 
 
 
-  exports.getUserByName = async (req, res) => {
-    
-    try{
-    
-      const {first_name} = req.params
-      const user = await User.findAll({
-        where :{
-          first_name
-        }});
+exports.getUserByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
 
-      return res.status(200).json({
-        success: true,
-        user,
-        message: 'User fetched successfully'
-      })
-    }
-    catch(error){
-      res.status(500).json({ 
-        success: false,
-        message:`Error fetching users ${error.message}`
-    })
+    const users = await User.findAll({
+      where: {
+        username: {
+          [Op.like]: `%${username}%`
+        }
+      },
+      order: [
+        [fn('LENGTH', col('username')), 'ASC']
+      ]
+    });
+
+    return res.status(200).json({
+      success: true,
+      users,
+      message: 'Users fetched successfully'
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false,
+      message: `Error fetching users: ${error.message}`
+    });
   }
-  }
+};

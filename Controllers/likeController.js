@@ -70,9 +70,11 @@ exports.toggleLike = async (req, res) => {
 };
 
 
+
 exports.getLikesForPost = async (req, res) => {
   try {
     const { post_id } = req.params;
+    const loggedInUserId = req.user.id;
 
     const likeCount = await Like.count({
       where: { post_id }
@@ -80,18 +82,23 @@ exports.getLikesForPost = async (req, res) => {
 
     const likes = await Like.findAll({
       where: { post_id },
-      include: [{ association: 'user', attributes: ['id', 'username', 'media_url'] }]
-    }); 
+      include: [{ association: "user", attributes: ["id", "username", "media_url"] }],
+    });
+
+    const likedByLoggedInUser = await Like.findOne({
+      where: { post_id, user_id: loggedInUserId },
+    });
 
     return res.status(200).json({
       success: true,
       likeCount,
-      likes
+      likes,
+      likedByLoggedInUser: !!likedByLoggedInUser, 
     });
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: `Failed to get likes: ${error.message}`
+      message: `Failed to get likes: ${error.message}`,
     });
   }
 };

@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllUsers, createUser, updateUser, deleteUser, getUserById, updateLoggedInUser, getUserByName } = require('../Controllers/userController');
+const { getAllUsers, createUser, updateUser, deleteUser, getUserById, updateLoggedInUser,  getUserByUsername } = require('../Controllers/userController');
 const { mediaUpload, imageUpload } = require('../Middlewares/multerMiddleware');
 const { loginUser, logoutUser } = require('../Controllers/userLoginControllere')
 const { getAllAdmins, createAdmin, updateAdmin, deleteAdmin } = require('../Controllers/adminController')
@@ -26,7 +26,7 @@ router.get('/feed', isAuthenticated, getUserFeed)
 
 router.get('/users', getAllUsers);
 router.get('/users/:id', isAuthenticated, getUserById)
-router.get('/user/:first_name', getUserByName)
+router.get('/user/:username', getUserByUsername)
 router.post('/createUser', imageUpload.single('media'), createUser);
 router.post('/createUser2', imageUpload.single('media'), createUser);
 router.put('/updateUser', imageUpload.single('media'), updateUser)
