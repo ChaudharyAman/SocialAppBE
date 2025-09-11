@@ -782,3 +782,69 @@ exports.getUserByUsername = async (req, res) => {
     });
   }
 };
+
+
+
+
+  exports.getUserByUsername2 = async (req, res) => {
+    
+    try{
+    
+      const {username} = req.params
+      const user = await User.findAll({
+        where :{
+          username
+        },
+        include: [
+        {
+          model: Post,
+          as: 'posts',
+          attributes: ['id', 'text', 'media_url', 'media_type', 'latitude', 'longitude', 'created_at'],
+          include: [
+            {
+              model: Like,
+              as: 'likes',
+              // attributes: ['id', 'user_id'],
+              // include: [
+              //   {
+              //     model: User,
+              //     as: 'user',
+              //     attributes: ['username']
+              //   }
+              // ]
+            },
+            {
+              model: Comment,
+              as: 'comments',
+              // attributes: ['id', 'text'],
+              // include: [
+              //   {
+              //     model: User,
+              //     as: 'user',
+              //     attributes: ['username']
+              //   }
+              // ]
+            }
+          ]
+        }
+      ],
+      order: [
+        ['id', 'ASC'],
+        [{ model: Post, as: 'posts' }, 'created_at', 'DESC']
+      ]
+    });
+
+      return res.status(200).json({
+        success: true,
+        user,
+        message: 'User with id fetched successfully'
+      })
+    }
+    catch(error){
+      res.status(500).json({ 
+        success: false,
+        message:`Error fetching users ${error.message}`
+    })
+  }
+  }
+
