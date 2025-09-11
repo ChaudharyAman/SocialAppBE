@@ -65,13 +65,13 @@ router.delete('/deleteComment', isAuthenticated, deleteComment);
 
 
 
-router.post('/sendRequest/:friend_id', isAuthenticated, sendFriendRequest);
+router.post('/sendRequest/:username', isAuthenticated, sendFriendRequest);
 router.get("/requestSent", isAuthenticated, getSentRequests);
-router.put('/acceptRequest',isAuthenticated, acceptFriendRequest);
-router.delete('/cancelRequest/:friend_id', isAuthenticated, cancelFriendRequest);
-router.get('/list/:user_id', getFriends);
+router.put('/acceptRequest/:username', isAuthenticated, acceptFriendRequest);
+router.delete('/cancelRequest/:username', isAuthenticated, cancelFriendRequest);
+router.get('/list/:username', getFriends);
 router.get("/friends", isAuthenticated, getMyFriends);
-router.delete('/removeFriend', isAuthenticated, removeFriend)
+router.delete('/removeFriend/:username', isAuthenticated, removeFriend);
 
 
 

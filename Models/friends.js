@@ -17,6 +17,16 @@ const Friend = sequelize.define('Friend', {
     },
     onDelete: 'CASCADE'
   },
+  user_username:{
+    type: DataTypes.STRING,
+    allowNull: false,
+     references: {
+      model: User,
+      key: 'username'
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  },
   friend_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -25,6 +35,16 @@ const Friend = sequelize.define('Friend', {
       key: 'id'
     },
     onDelete: 'CASCADE'
+  },
+    friend_username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    references: {
+      model: User,
+      key: 'username'
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
   },
   status: {
     type: DataTypes.ENUM('pending', 'accepted'),

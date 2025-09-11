@@ -1,4 +1,3 @@
-const { Association } = require('sequelize');
 const { Op, fn, col } = require("sequelize");
 const User = require('../Models/users');
 const Post = require('../Models/posts');
