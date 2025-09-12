@@ -317,28 +317,115 @@ exports.getMyFriends = async (req, res) => {
     const friends = await Friend.findAll({
       where: {
         status: "accepted",
-        [Op.or]: [{ user_id: loggedInUserId }, { friend_id: loggedInUserId }]
-      }
+        [Op.or]: [
+          { user_id: loggedInUserId },
+          { friend_id: loggedInUserId }
+        ]
+      },
+      include: [
+        { model: User, as: "requester", attributes: ["id", "username", "first_name", "last_name", "media_url"] },
+        { model: User, as: "receiver", attributes: ["id", "username", "first_name", "last_name", "media_url"] }
+      ]
     });
 
     const formattedFriends = friends.map(f => {
       if (f.user_id === loggedInUserId) {
-        return { id: f.friend_id, username: f.friend_username };
-      } 
-      else {
-        return { id: f.user_id, username: f.user_username };
+        return f.receiver;
+      } else {
+        return f.requester;
       }
     });
 
-    res.status(200).json({ 
-      success: true, 
-      friends: formattedFriends 
+    res.status(200).json({
+      success: true,
+      friends: formattedFriends
+    });
 
+  } catch (error) {
+    console.error("Error fetching friends:", error);
+    res.status(500).json({
+      success: false,
+      message: `Error getting friends: ${error.message}`
+    });
+  }
+};
+
+
+
+
+exports.getUserFriendsByUsername = async (req, res) => {
+  try {
+    const { username } = req.params;
+
+    if (!username) {
+      return res.status(400).json({
+        success: false,
+        message: "Username is required",
+      });
+    }
+
+    const user = await User.findOne({
+      where: { username },
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const friends = await Friend.findAll({
+      where: {
+        status: "accepted",
+        [Op.or]: [{ user_id: user.id }, { friend_id: user.id }],
+      },
+      include: [
+        {
+          model: User,
+          as: "requester",
+          attributes: ["id", "username", "first_name", "last_name", "media_url"],
+        },
+        {
+          model: User,
+          as: "receiver",
+          attributes: ["id", "username", "first_name", "last_name", "media_url"],
+        },
+      ],
+    });
+
+    const formattedFriends = friends.map((f) => {
+      if (f.user_id === user.id) {
+        return {
+          id: f.receiver.id,
+          username: f.receiver.username,
+          first_name: f.receiver.first_name,
+          last_name: f.receiver.last_name,
+          media_url: f.receiver.media_url,
+          status: f.status,
+        };
+      } else {
+        // If current user is the receiver → show requester
+        return {
+          id: f.requester.id,
+          username: f.requester.username,
+          first_name: f.requester.first_name,
+          last_name: f.requester.last_name,
+          media_url: f.requester.media_url,
+          status: f.status,
+        };
+      }
+    });
+
+    return res.status(200).json({
+      success: true,
+      friends: formattedFriends,
     });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: `Error getting friends: ${error.message}` 
+    console.error("Error fetching user friends:", error);
+    return res.status(500).json({
+      success: false,
+      message: `Error fetching user friends: ${error.message}`,
     });
   }
 };
