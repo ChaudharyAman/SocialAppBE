@@ -9,7 +9,7 @@ const { isAuthenticated } = require('../Middlewares/auth');
 const { toggleLike, getLikesForPost }  = require('../Controllers/likeController');
 const { getAllData } = require('../Controllers/dataController');
 const { createComment, deleteComment, getCommentsForPost } = require('../Controllers/commentController');
-const { sendFriendRequest, acceptFriendRequest, cancelFriendRequest, getFriends, removeFriend, getMyFriends, getSentRequests, getUserFriendsByUsername } = require('../Controllers/friendController');
+const { sendFriendRequest, acceptFriendRequest, cancelFriendRequest, getFriends, removeFriend, getMyFriends, getSentRequests, getUserFriendsByUsername, getPendingRequests } = require('../Controllers/friendController');
 const { getUserFeed } = require('../Controllers/feedController');
 const { getChatHistory, sendMessage} = require('../Controllers/messageController');
 const { meUser } = require('../Controllers/meController');
@@ -73,6 +73,7 @@ router.delete('/cancelRequest/:username', isAuthenticated, cancelFriendRequest);
 router.get('/list/:username', getFriends);
 router.get("/friends", isAuthenticated, getMyFriends);
 router.get("/Friends/:username", isAuthenticated, getUserFriendsByUsername);
+router.get("/pendingRequests", isAuthenticated, getPendingRequests);
 router.delete('/removeFriend/:username', isAuthenticated, removeFriend);
 
 

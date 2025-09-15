@@ -2,6 +2,8 @@ const Friend = require('../Models/friends');
 const User = require('../Models/users');
 const { Op } = require('sequelize');
 
+
+
 exports.sendFriendRequest = async (req, res) => {
   try {
     const { username } = req.params;
@@ -405,7 +407,6 @@ exports.getUserFriendsByUsername = async (req, res) => {
           status: f.status,
         };
       } else {
-        // If current user is the receiver → show requester
         return {
           id: f.requester.id,
           username: f.requester.username,
@@ -426,6 +427,56 @@ exports.getUserFriendsByUsername = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: `Error fetching user friends: ${error.message}`,
+    });
+  }
+};
+
+
+
+exports.getPendingRequests = async (req, res) => {
+  try {
+    const user_id = req.user.id;
+
+    if (!user_id) {
+      return res.status(401).json({
+        success: false,
+        message: "You must be logged in to view pending requests",
+      });
+    }
+
+    const pendingRequests = await Friend.findAll({
+      where: {
+        friend_id: user_id,
+        status: 'pending',
+      },
+      include: [
+        {
+          model: User,
+          as: 'requester',
+          attributes: ['id', 'username', 'first_name', 'last_name', 'media_url'],
+        },
+      ],
+    });
+
+    const formattedRequests = pendingRequests.map(req => ({
+      user_id: req.requester.id,
+      username: req.requester.username,
+      first_name: req.requester.first_name,
+      last_name: req.requester.last_name,
+      media_url: req.requester.media_url,
+      status: req.status,
+    }));
+
+    return res.status(200).json({
+      success: true,
+      pendingRequests: formattedRequests,
+    });
+
+  } catch (error) {
+    console.error("Error fetching pending friend requests:", error);
+    return res.status(500).json({
+      success: false,
+      message: `Error fetching pending requests: ${error.message}`,
     });
   }
 };
