@@ -7,7 +7,9 @@ exports.sendMessage = async (req, res) => {
 
  const senderId = req.user.id;
 
- const { friend_id, message } = req.body;
+  const friend_id = parseInt(req.params.friend_id)
+
+ const { message } = req.body;
 
   if (!friend_id || !message) {
     return res.status(400).json({

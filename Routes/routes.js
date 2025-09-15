@@ -78,7 +78,7 @@ router.delete('/removeFriend/:username', isAuthenticated, removeFriend);
 
 
 
-router.post('/sendMessage', isAuthenticated, sendMessage);
+router.post('/message/:friend_id', isAuthenticated, sendMessage);
 router.get('/history/:friend_id', isAuthenticated, getChatHistory);
 
 
