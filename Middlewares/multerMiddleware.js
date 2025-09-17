@@ -16,7 +16,7 @@ const mediaStorage = new CloudinaryStorage({
 
     return {
       folder: 'media ( Images, Video )',
-      allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'mp4'],
+      allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'avif', 'mp4'],
       resource_type: isVideo ? 'video' : 'image',
       public_id: `${isVideo ? 'VID' : 'IMG'}-${timestamp}_${baseName}`,
        transformation: !isVideo ? [
@@ -42,7 +42,7 @@ const imageStorage = new CloudinaryStorage({
 
     return {
       folder: 'media ( Images, Video )',
-      allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+      allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'avif'],
       resource_type: 'image',
       public_id: `${'IMG'}-${timestamp}_${baseName}`,
        transformation: [

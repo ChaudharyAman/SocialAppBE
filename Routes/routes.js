@@ -11,7 +11,7 @@ const { getAllData } = require('../Controllers/dataController');
 const { createComment, deleteComment, getCommentsForPost } = require('../Controllers/commentController');
 const { sendFriendRequest, acceptFriendRequest, cancelFriendRequest, getFriends, removeFriend, getMyFriends, getSentRequests, getUserFriendsByUsername, getPendingRequests } = require('../Controllers/friendController');
 const { getUserFeed } = require('../Controllers/feedController');
-const { getChatHistory, sendMessage} = require('../Controllers/messageController');
+const { getChatHistory, sendMessage, getRecentChats} = require('../Controllers/messageController');
 const { meUser } = require('../Controllers/meController');
 
 
@@ -80,6 +80,7 @@ router.delete('/removeFriend/:username', isAuthenticated, removeFriend);
 
 router.post('/message/:friend_id', isAuthenticated, sendMessage);
 router.get('/history/:friend_id', isAuthenticated, getChatHistory);
+router.get("/recentChats", isAuthenticated, getRecentChats);
 
 
 

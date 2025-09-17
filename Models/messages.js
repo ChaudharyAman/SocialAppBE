@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../Config/db');
+const User = require('./users');
 
 const Message = sequelize.define('Message', {
   id: {
@@ -27,5 +28,8 @@ const Message = sequelize.define('Message', {
   tableName: 'messages',
   timestamps: false
 });
+
+Message.belongsTo(User, { as: 'sender', foreignKey: 'senderId' });
+Message.belongsTo(User, { as: 'receiver', foreignKey: 'receiverId' });
 
 module.exports = Message;
