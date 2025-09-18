@@ -1,4 +1,4 @@
-# SOCIALAPPBE
+# SOCIAL_APP_BE
 
 **Empowering Real-Time Connections, Igniting Social Engagement**
 
