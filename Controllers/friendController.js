@@ -1,8 +1,6 @@
-const Friend = require('../Models/friends');
-const User = require('../Models/users');
-const { Op } = require('sequelize');
-
-
+const Friend = require("../Models/friends");
+const User = require("../Models/users");
+const { Op } = require("sequelize");
 
 exports.sendFriendRequest = async (req, res) => {
   try {
@@ -10,49 +8,57 @@ exports.sendFriendRequest = async (req, res) => {
     const user_id = req.user.id;
 
     if (!user_id) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "You must be logged in to send friend request" });
+      return res.status(401).json({
+        success: false,
+        message: "You must be logged in to send friend request",
+      });
     }
     if (!username) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "username is required" });
+      return res.status(400).json({
+        success: false,
+        message: "username is required",
+      });
     }
 
-    const friendUser = await User.findOne({ 
-    where: { 
-      username 
-    } });
+    const friendUser = await User.findOne({
+      where: {
+        username,
+      },
+    });
     const user = await User.findByPk(user_id);
 
     if (!user || !friendUser) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
     if (user.id == friendUser.id) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "You cannot send a friend request to yourself" });
+      return res.status(400).json({
+        success: false,
+        message: "You cannot send a friend request to yourself",
+      });
     }
 
     const existingRequest = await Friend.findOne({
-      where: { 
-        user_id: user.id, 
-        friend_id: friendUser.id }
+      where: {
+        user_id: user.id,
+        friend_id: friendUser.id,
+      },
     });
     const reverseRequest = await Friend.findOne({
-      where: { 
-        user_id: friendUser.id, 
-        friend_id: user.id }
+      where: {
+        user_id: friendUser.id,
+        friend_id: user.id,
+      },
     });
 
     if (existingRequest || reverseRequest) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Friend request already sent or already friends" });
+      return res.status(400).json({
+        success: false,
+        message: "Friend request already sent or already friends",
+      });
     }
 
     const request = await Friend.create({
@@ -60,16 +66,19 @@ exports.sendFriendRequest = async (req, res) => {
       user_username: user.username,
       friend_id: friendUser.id,
       friend_username: friendUser.username,
-      status: 'pending'
+      status: "pending",
     });
 
-    return res.status(201).json({ 
-      success: true, 
-      message: "Friend request sent", data: request });
+    return res.status(201).json({
+      success: true,
+      message: "Friend request sent",
+      data: request,
+    });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: `Error sending friend request. ${error.message}` });
+    res.status(500).json({
+      success: false,
+      message: `Error sending friend request. ${error.message}`,
+    });
   }
 };
 
@@ -79,84 +88,90 @@ exports.acceptFriendRequest = async (req, res) => {
     const user_id = req.user.id;
 
     if (!user_id) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "You must be logged in to accept friend request" });
+      return res.status(401).json({
+        success: false,
+        message: "You must be logged in to accept friend request",
+      });
     }
 
-    const friendUser = await User.findOne({ 
-      where: { 
-      username 
-
-    } });
+    const friendUser = await User.findOne({
+      where: {
+        username,
+      },
+    });
     if (!friendUser) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
     const request = await Friend.findOne({
       where: {
         user_id: friendUser.id,
         friend_id: user_id,
-        status: 'pending'
-      }
+        status: "pending",
+      },
     });
 
     if (!request) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "No pending friend request found from this user" });
+      return res.status(404).json({
+        success: false,
+        message: "No pending friend request found from this user",
+      });
     }
 
-
-    request.status = 'accepted';
+    request.status = "accepted";
     await request.save();
 
-    return res.status(200).json({ 
-      success: true, 
-      message: "Friend request accepted", data: request });
+    return res.status(200).json({
+      success: true,
+      message: "Friend request accepted",
+      data: request,
+    });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: `Error accepting friend request: ${error.message}` });
+    res.status(500).json({
+      success: false,
+      message: `Error accepting friend request: ${error.message}`,
+    });
   }
 };
-
 
 exports.getSentRequests = async (req, res) => {
   try {
     const user_id = req.user.id;
 
     if (!user_id) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "You must be logged in to view sent requests" });
+      return res.status(401).json({
+        success: false,
+        message: "You must be logged in to view sent requests",
+      });
     }
 
     const sentRequests = await Friend.findAll({
-      where: { 
-        user_id, 
-        status: "pending" }
+      where: {
+        user_id,
+        status: "pending",
+      },
     });
 
-    const formattedRequests = sentRequests.map(req => ({
+    const formattedRequests = sentRequests.map((req) => ({
       friend_id: req.friend_id,
       friend_username: req.friend_username,
-      status: req.status
+      status: req.status,
     }));
 
-    res.status(200).json({ 
-      success: true, 
-      requests: formattedRequests });
+    res.status(200).json({
+      success: true,
+      requests: formattedRequests,
+    });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: `Error getting sent requests: ${error.message}` });
+    res.status(500).json({
+      success: false,
+      message: `Error getting sent requests: ${error.message}`,
+    });
   }
 };
-
-
 
 exports.cancelFriendRequest = async (req, res) => {
   try {
@@ -164,18 +179,22 @@ exports.cancelFriendRequest = async (req, res) => {
     const user_id = req.user.id;
 
     if (!user_id) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "You must be logged in to cancel a friend request" });
+      return res.status(401).json({
+        success: false,
+        message: "You must be logged in to cancel a friend request",
+      });
     }
 
-    const friendUser = await User.findOne({ 
-      where: { 
-      username } });
+    const friendUser = await User.findOne({
+      where: {
+        username,
+      },
+    });
     if (!friendUser) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "User not found" });
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
     const request = await Friend.findOne({
@@ -188,71 +207,68 @@ exports.cancelFriendRequest = async (req, res) => {
       },
     });
 
-
     if (!request) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "No pending friend request found to cancel" });
+      return res.status(404).json({
+        success: false,
+        message: "No pending friend request found to cancel",
+      });
     }
 
     await request.destroy();
-    return res.status(200).json({ 
-      success: true, 
-      message: "Friend request cancelled" });
-  } 
-  catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: `Error cancelling friend request: ${error.message}` });
+    return res.status(200).json({
+      success: true,
+      message: "Friend request cancelled",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Error cancelling friend request: ${error.message}`,
+    });
   }
 };
-
 
 exports.getFriends = async (req, res) => {
   try {
     const { username } = req.params;
 
-    const user = await User.findOne({ 
-      where: { 
-      username 
-
-    } });
+    const user = await User.findOne({
+      where: {
+        username,
+      },
+    });
     if (!user) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "User not found" 
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
     }
 
     const friends = await Friend.findAll({
       where: {
-        status: 'accepted',
-        [Op.or]: [{ user_id: user.id }, { friend_id: user.id }]
-      }
+        status: "accepted",
+        [Op.or]: [{ user_id: user.id }, { friend_id: user.id }],
+      },
     });
 
-    const formattedFriends = friends.map(f => ({
+    const formattedFriends = friends.map((f) => ({
       user_id: f.user_id,
       user_username: f.user_username,
       friend_id: f.friend_id,
       friend_username: f.friend_username,
-      status: f.status
+      status: f.status,
     }));
 
-    res.status(200).json({ 
-      success: true, 
-      friends: formattedFriends 
-
+    res.status(200).json({
+      success: true,
+      friends: formattedFriends,
     });
   } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: `Error getting friends ${error.message}` 
+    res.status(500).json({
+      success: false,
+      message: `Error getting friends ${error.message}`,
     });
   }
 };
-
-
 
 exports.removeFriend = async (req, res) => {
   try {
@@ -260,23 +276,21 @@ exports.removeFriend = async (req, res) => {
     const user_id = req.user.id;
 
     if (!user_id) {
-      return res.status(401).json({ 
-        success: false, 
-        message: "You must be logged in to remove friend" 
-
+      return res.status(401).json({
+        success: false,
+        message: "You must be logged in to remove friend",
       });
     }
 
-    const friendUser = await User.findOne({ 
-      where: { 
-      username 
-
-    } });
+    const friendUser = await User.findOne({
+      where: {
+        username,
+      },
+    });
     if (!friendUser) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "User not found" 
-
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
     }
 
@@ -284,33 +298,30 @@ exports.removeFriend = async (req, res) => {
       where: {
         [Op.or]: [
           { user_id, friend_id: friendUser.id, status: "accepted" },
-          { user_id: friendUser.id, friend_id: user_id, status: "accepted" }
-        ]
-      }
+          { user_id: friendUser.id, friend_id: user_id, status: "accepted" },
+        ],
+      },
     });
 
     if (!friend) {
-      return res.status(404).json({ 
-        success: false, 
-        message: "Friend does not exist" 
-
+      return res.status(404).json({
+        success: false,
+        message: "Friend does not exist",
       });
     }
 
     await friend.destroy();
-    return res.status(200).json({ 
-      success: true, 
-      message: "Friend successfully removed" });
-  } 
-  catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: `Failed to remove friend. ${error.message}` 
+    return res.status(200).json({
+      success: true,
+      message: "Friend successfully removed",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: `Failed to remove friend. ${error.message}`,
     });
   }
 };
-
-
 
 exports.getMyFriends = async (req, res) => {
   try {
@@ -319,18 +330,35 @@ exports.getMyFriends = async (req, res) => {
     const friends = await Friend.findAll({
       where: {
         status: "accepted",
-        [Op.or]: [
-          { user_id: loggedInUserId },
-          { friend_id: loggedInUserId }
-        ]
+        [Op.or]: [{ user_id: loggedInUserId }, { friend_id: loggedInUserId }],
       },
       include: [
-        { model: User, as: "requester", attributes: ["id", "username", "first_name", "last_name", "media_url"] },
-        { model: User, as: "receiver", attributes: ["id", "username", "first_name", "last_name", "media_url"] }
-      ]
+        {
+          model: User,
+          as: "requester",
+          attributes: [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "media_url",
+          ],
+        },
+        {
+          model: User,
+          as: "receiver",
+          attributes: [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "media_url",
+          ],
+        },
+      ],
     });
 
-    const formattedFriends = friends.map(f => {
+    const formattedFriends = friends.map((f) => {
       if (f.user_id === loggedInUserId) {
         return f.receiver;
       } else {
@@ -340,20 +368,16 @@ exports.getMyFriends = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      friends: formattedFriends
+      friends: formattedFriends,
     });
-
   } catch (error) {
     console.error("Error fetching friends:", error);
     res.status(500).json({
       success: false,
-      message: `Error getting friends: ${error.message}`
+      message: `Error getting friends: ${error.message}`,
     });
   }
 };
-
-
-
 
 exports.getUserFriendsByUsername = async (req, res) => {
   try {
@@ -386,12 +410,24 @@ exports.getUserFriendsByUsername = async (req, res) => {
         {
           model: User,
           as: "requester",
-          attributes: ["id", "username", "first_name", "last_name", "media_url"],
+          attributes: [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "media_url",
+          ],
         },
         {
           model: User,
           as: "receiver",
-          attributes: ["id", "username", "first_name", "last_name", "media_url"],
+          attributes: [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "media_url",
+          ],
         },
       ],
     });
@@ -431,8 +467,6 @@ exports.getUserFriendsByUsername = async (req, res) => {
   }
 };
 
-
-
 exports.getPendingRequests = async (req, res) => {
   try {
     const user_id = req.user.id;
@@ -447,18 +481,24 @@ exports.getPendingRequests = async (req, res) => {
     const pendingRequests = await Friend.findAll({
       where: {
         friend_id: user_id,
-        status: 'pending',
+        status: "pending",
       },
       include: [
         {
           model: User,
-          as: 'requester',
-          attributes: ['id', 'username', 'first_name', 'last_name', 'media_url'],
+          as: "requester",
+          attributes: [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "media_url",
+          ],
         },
       ],
     });
 
-    const formattedRequests = pendingRequests.map(req => ({
+    const formattedRequests = pendingRequests.map((req) => ({
       user_id: req.requester.id,
       username: req.requester.username,
       first_name: req.requester.first_name,
@@ -471,7 +511,6 @@ exports.getPendingRequests = async (req, res) => {
       success: true,
       pendingRequests: formattedRequests,
     });
-
   } catch (error) {
     console.error("Error fetching pending friend requests:", error);
     return res.status(500).json({
