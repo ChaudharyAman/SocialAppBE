@@ -3,11 +3,13 @@ const cors = require("cors");
 const sequelize = require("./Config/db");
 const allRoutes = require("./Routes/routes");
 require("dotenv").config();
-const { initSocket } = require("./socket");
 const http = require("http");
 const cookieParser = require("cookie-parser");
+const { initSocket } = require("./socket");
 
 const app = express();
+
+const BASE_URL = process.env.BASE_URL
 
 const PORT = process.env.PORT || 5000;
 
@@ -15,7 +17,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: BASE_URL,
     credentials: true,
   })
 );

@@ -13,10 +13,11 @@ exports.loginUser = async (req, res) => {
         message: "Please provide username and password",
       });
     }
-    const user = await User.findOne({
-      where: {
-        username,
-      },
+
+    const user = await User.findOne({ 
+        where: { 
+            username 
+        } 
     });
     if (!user) {
       return res.status(401).json({
@@ -25,10 +26,7 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    const payload = {
-      username: user.username,
-      id: user.id,
-    };
+    const payload = { username: user.username, id: user.id };
 
     if (await bcrypt.compare(password, user.password)) {
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -39,23 +37,22 @@ exports.loginUser = async (req, res) => {
         expires: new Date(Date.now() + 3 * 60 * 60 * 1000),
         httpOnly: true,
       };
-      return res.cookie("token", token, options).status(200).json({
-        success: true,
-        user,
-        token,
-        message: "User logged in successfully",
-      });
+
+      return res
+        .cookie("token", token, options)
+        .status(200)
+        .json({ success: true, user, token });
     } else {
       return res.status(401).json({
         success: false,
         message: "Invalid password",
       });
     }
-  } catch (error) {
-    console.log(error);
+  } 
+  catch (error) {
     return res.status(500).json({
       success: false,
-      message: `Login failed, ${error.message}`,
+      message: `Login failed: ${error.message}`,
     });
   }
 };
@@ -63,17 +60,18 @@ exports.loginUser = async (req, res) => {
 exports.logoutUser = async (req, res) => {
   try {
     res.clearCookie("token", {
-      httpOnly: true,
-    });
-
+         httpOnly: true
+        });
     return res.status(200).json({
       success: true,
       message: "User logged out successfully",
     });
-  } catch (error) {
+  } 
+
+  catch (error) {
     return res.status(500).json({
       success: false,
-      message: `Logout failed, ${error.message}`,
+      message: `Logout failed: ${error.message}`,
     });
   }
 };
