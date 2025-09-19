@@ -26,6 +26,10 @@ app.use(express.json());
 
 app.use("/api/v1", allRoutes);
 
+app.get('/' , (req,res)=>{
+  return res.send("Server Is running")
+})
+
 // app.use(express.json({
 //   strict: true,
 //   type: ['application/json']
