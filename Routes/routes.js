@@ -36,7 +36,7 @@ router.delete('/deleteUser', deleteUser)
 
 router.post('/loginUser', loginUser);
 router.post('/logoutUser', logoutUser);
-router.get("/checkAuth", isAuthenticated, (req, res) => { return res.json({success: true, user: req.user});});
+router.get('/checkAuth', isAuthenticated, (req, res) => { return res.json({success: true, user: req.user});});
 
 
 
