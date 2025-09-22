@@ -4,6 +4,8 @@ const Post = require("../Models/posts");
 const Like = require("../Models/likes");
 const Comment = require("../Models/comments");
 const bcrypt = require("bcrypt");
+const moment = require('moment');
+
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -808,7 +810,10 @@ exports.createUser2 = async (req, res) => {
       });
     }
     console.error(error);
-    res.status(500).json({ success: false, message: "Internal server error" });
+    res.status(500).json({ 
+      success: false, 
+      message: `Internal server error ${error.message}`
+     });
   }
 };
 

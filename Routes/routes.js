@@ -1,5 +1,5 @@
 const express = require('express');
-const { getAllUsers, createUser, updateUser, deleteUser, getUserById, updateLoggedInUser,  getUserByUsername, getUserByUsername2 } = require('../Controllers/userController');
+const { getAllUsers, createUser, createUser2, updateUser, deleteUser, getUserById, updateLoggedInUser,  getUserByUsername, getUserByUsername2 } = require('../Controllers/userController');
 const { mediaUpload, imageUpload } = require('../Middlewares/multerMiddleware');
 const { loginUser, logoutUser } = require('../Controllers/userLoginControllere')
 const { getAllAdmins, createAdmin, updateAdmin, deleteAdmin } = require('../Controllers/adminController')
@@ -29,7 +29,7 @@ router.get('/users/:id', isAuthenticated, getUserById)
 router.get('/User/:username', isAuthenticated, getUserByUsername2)
 router.get('/fetchUser/:username', isAuthenticated, getUserByUsername)
 router.post('/createUser', imageUpload.single('media'), createUser);
-router.post('/createUser2', imageUpload.single('media'), createUser);
+router.post('/createUser2', imageUpload.single('media'), createUser2);
 router.put('/updateUser', imageUpload.single('media'), updateUser)
 router.put( "/updateProfile", isAuthenticated, imageUpload.single("media"), updateLoggedInUser );
 router.delete('/deleteUser', deleteUser)
