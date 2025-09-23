@@ -21,6 +21,7 @@ app.use(
   cors({
     origin: BASE_URL,
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 
