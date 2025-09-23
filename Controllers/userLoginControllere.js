@@ -40,6 +40,10 @@ exports.loginUser = async (req, res) => {
         sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       };
 
+      res.cookie("token", token, options);
+
+      res.setHeader("Authorization", `Bearer ${token}`);
+
       return res
         .status(200)
         .json({ success: true, user, token });
