@@ -37,14 +37,11 @@ exports.loginUser = async (req, res) => {
         expires: new Date(Date.now() + 3 * 60 * 60 * 1000),
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        secure: true,
-        sameSite: "None",
-        sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       };
 
       res.cookie("token", token, options);
 
-      res.setHeader("Authorization", `Bearer ${token}`);
 
       return res.status(200).json({ success: true, user, token });
     } else {
