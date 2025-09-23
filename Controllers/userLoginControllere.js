@@ -2,6 +2,7 @@ const User = require("../Models/users");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
+
 exports.loginUser = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -13,10 +14,10 @@ exports.loginUser = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ 
-        where: { 
-            username 
-        } 
+    const user = await User.findOne({
+      where: {
+        username,
+      },
     });
     if (!user) {
       return res.status(401).json({
@@ -35,7 +36,9 @@ exports.loginUser = async (req, res) => {
       const options = {
         expires: new Date(Date.now() + 3 * 60 * 60 * 1000),
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", 
+        secure: process.env.NODE_ENV === "production",
+        secure: true,
+        sameSite: "None",
         sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
       };
 
@@ -43,17 +46,14 @@ exports.loginUser = async (req, res) => {
 
       res.setHeader("Authorization", `Bearer ${token}`);
 
-      return res
-        .status(200)
-        .json({ success: true, user, token });
+      return res.status(200).json({ success: true, user, token });
     } else {
       return res.status(401).json({
         success: false,
         message: "Invalid password",
       });
     }
-  } 
-  catch (error) {
+  } catch (error) {
     return res.status(500).json({
       success: false,
       message: `Login failed: ${error.message}`,
@@ -64,15 +64,13 @@ exports.loginUser = async (req, res) => {
 exports.logoutUser = async (req, res) => {
   try {
     res.clearCookie("token", {
-         httpOnly: true
-        });
+      httpOnly: true,
+    });
     return res.status(200).json({
       success: true,
       message: "User logged out successfully",
     });
-  } 
-
-  catch (error) {
+  } catch (error) {
     return res.status(500).json({
       success: false,
       message: `Logout failed: ${error.message}`,
