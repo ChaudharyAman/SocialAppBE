@@ -41,8 +41,8 @@ const User = sequelize.define(
     },
     gender: {
       type: DataTypes.ENUM(
-        "male",
-        "female",
+        "Male",
+        "Female",
         "Strictly Male",
         "Strictly Female",
         "non-binary",
@@ -65,7 +65,7 @@ const User = sequelize.define(
         "Aerogender",
         "Amaregender",
         "Blurgender",
-        "other"
+        "Other"
       ),
       allowNull: false,
       defaultValue: "other",
