@@ -6,8 +6,7 @@ require("dotenv").config();
 const http = require("http");
 const cookieParser = require("cookie-parser");
 const { initSocket } = require("./socket");
-const morgan = require("morgan");
-morgan("dev");
+
 
 const app = express();
 

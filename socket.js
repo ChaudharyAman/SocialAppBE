@@ -20,8 +20,10 @@ function initSocket(server) {
     socket.on("send_message", (msg) => {
       if (msg.receiverId) {
         io.to(msg.receiverId.toString()).emit("receive_message", msg);
+        io.to(msg.receiverId.toString()).emit("receive_message_notification", msg);
       }
     });
+
 
     socket.on("disconnect", () => {});
   });
