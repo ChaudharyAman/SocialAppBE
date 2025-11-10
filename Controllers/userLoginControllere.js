@@ -30,11 +30,11 @@ exports.loginUser = async (req, res) => {
 
     if (await bcrypt.compare(password, user.password)) {
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "2h",
+        expiresIn: "24h",
       });
 
       const options = {
-        expires: new Date(Date.now() + 3 * 60 * 60 * 1000),
+        expires: new Date(Date.now() + 36 * 60 * 60 * 1000),
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
